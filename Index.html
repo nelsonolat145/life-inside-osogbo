@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Osogbo Life ULTIMATE v2 - Keke & Okada</title>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Syne:wght@700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#fff;font-family:'Space Grotesk',sans-serif;overflow:hidden}
+.container{max-width:500px;margin:0 auto;padding:10px;overflow-y:auto;height:100vh}
+.header{text-align:center;padding:14px 0;border-bottom:2px solid #ff6b00;margin-bottom:10px}
+.header h1{font-family:'Syne',sans-serif;font-size:20px;color:#ff6b00}
+.card{background:#151515;border:1px solid #2a2a2a;border-radius:16px;padding:14px;margin-bottom:10px}
+.input{background:#1f1f1f;border:1px solid #333;padding:12px;border-radius:10px;color:#fff;width:100%;margin-bottom:8px;font-size:13px}
+.btn{background:#ff6b00;color:#000;padding:12px;border:none;border-radius:10px;font-weight:700;width:100%;cursor:pointer}
+.btn-s{background:#222;color:#fff;border:1px solid #333}
+.tabs{display:flex;gap:5px;margin-bottom:10px}
+.tab{flex:1;padding:8px;background:#1a1a1a;border:1px solid #333;border-radius:8px;text-align:center;font-size:11px;cursor:pointer}
+.tab.active{background:#ff6b00;color:#000;font-weight:700}
+.area-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
+.ab{background:#1a1a1a;border:2px solid #2a2a2a;padding:8px;border-radius:10px;cursor:pointer}
+.ab.sel{border-color:#ff6b00;background:#2a1a0a}
+.ad-box{background:#222;border:1px dashed #ff6b00;padding:9px;border-radius:10px;text-align:center;margin-bottom:10px;font-size:11px}
+.badge{display:inline-block;padding:2px 6px;border-radius:10px;font-size:9px;font-weight:700}
+.badge-premium{background:#ff6b00;color:#000}
+.badge-free{background:#333;color:#fff}
+#gameWrap{position:fixed;top:0;left:0;width:100vw;height:100vh;display:none;background:#000;z-index:100}
+#gameCanvas{display:block;background:#2d5016}
+#ui{position:absolute;top:0;left:0;right:0;pointer-events:none}
+.top-bar{display:flex;justify-content:space-between;padding:10px;background:linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);pointer-events:auto}
+.stat-pill{background:rgba(0,0,0,0.7);border:1px solid #ff6b00;padding:5px 10px;border-radius:20px;font-size:10px;display:flex;align-items:center;gap:4px}
+.cash-pill{background:linear-gradient(135deg,#ff6b00,#ff3c00);color:#000;font-weight:700}
+.vehicle-pill{background:#FFD700;color:#000;font-weight:700;display:none}
+#joystick{position:absolute;bottom:20px;left:20px;width:110px;height:110px;pointer-events:auto;touch-action:none}
+#joyBase{width:100%;height:100%;background:rgba(255,255,255,0.1);border:2px solid rgba(255,107,0,0.5);border-radius:50%;position:relative}
+#joyStick{width:45px;height:45px;background:#ff6b00;border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+#actions{position:absolute;bottom:20px;right:20px;display:flex;flex-direction:column;gap:9px;pointer-events:auto}
+.act-btn{width:55px;height:55px;background:rgba(0,0,0,0.7);border:2px solid #ff6b00;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer}
+#eventModal{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#151515;border:2px solid #ff6b00;border-radius:18px;padding:16px;width:92%;max-width:340px;display:none;pointer-events:auto;z-index:200}
+.opt-btn{background:#222;border:1px solid #333;padding:9px;border-radius:9px;color:#fff;width:100%;margin-bottom:6px;text-align:left;font-size:11px;cursor:pointer}
+#miniMap{position:absolute;top:60px;right:10px;width:90px;height:90px;background:rgba(0,0,0,0.7);border:1px solid #ff6b00;border-radius:9px;overflow:hidden;pointer-events:auto}
+#locationName{position:absolute;bottom:150px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);padding:5px 14px;border-radius:20px;font-size:11px;border:1px solid #ff6b00;pointer-events:none}
+#adminScreen{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0a0a0a;z-index:150;overflow-y:auto;display:none;padding:10px}
+.admin-table{width:100%;font-size:10px;border-collapse:collapse}
+.admin-table th,.admin-table td{padding:5px;border-bottom:1px solid #222;text-align:left}
+</style>
+</head>
+<body>
+<div id="authContainer" class="container">
+<div class="header"><h1>LIFE INSIDE OSOGBO v2</h1><p style="opacity:.6;font-size:10px">ULTIMATE • Keke + Okada Driving • Visual</p></div>
+<div id="authScreen">
+<div class="card">
+<div class="tabs"><div class="tab active" id="tL" onclick="sw('l')">Login</div><div class="tab" id="tS" onclick="sw('s')">Sign Up</div><div class="tab" id="tA" onclick="sw('a')">Admin</div></div>
+<div id="fL"><input id="le" class="input" placeholder="Email"><input id="lp" class="input" type="password" placeholder="Password"><button class="btn" onclick="doLogin()">Enter Osogbo →</button></div>
+<div id="fS" style="display:none"><input id="sn" class="input" placeholder="Osogbo Name"><input id="se" class="input" placeholder="Email"><input id="sp" class="input" type="password" placeholder="Password"><button class="btn" onclick="doSignup()">Create Account →</button></div>
+<div id="fA" style="display:none"><input id="aei" class="input" value="admin@osogbo.com"><input id="aep" class="input" type="password" value="admin123"><button class="btn" onclick="doAdminLogin()">Admin Login →</button></div>
+<div id="err" style="color:#ff5555;font-size:11px;margin-top:6px;text-align:center"></div>
+</div>
+<div class="card"><h3 style="font-size:12px">🏆 Top Omo Osun</h3><div id="lb">No players</div></div>
+<div class="ad-box">🛺 NEW: Drive Keke & Okada around Osogbo! Go Olaiya park to enter Keke!</div>
+</div>
+<div id="setupScreen" style="display:none">
+<div class="card"><h2>Welcome <span id="wn"></span>! <span id="premBadge"></span></h2>
+<div id="notPremiumBox" class="ad-box">⭐ Remove ads + ₦100k + Free Keke rides: <button class="btn" style="width:auto;padding:5px 10px;margin-top:5px;font-size:11px" onclick="buyRemoveAds()">Pay ₦<span id="priceDisplay">500</span> Paystack</button></div>
+<p style="font-size:11px;opacity:.7;margin:8px 0">Where you start?</p>
+<div class="area-grid">
+<div class="ab sel" data-a="Oke-Baale"><h4>🏚️ Oke-Baale</h4><p style="font-size:9px">Street+20 ₦20k</p></div>
+<div class="ab" data-a="Oke-Fia"><h4>🏠 Oke-Fia</h4><p style="font-size:9px">Balanced ₦80k</p></div>
+<div class="ab" data-a="GRA"><h4>🏡 GRA</h4><p style="font-size:9px">Rich ₦500k + Car</p></div>
+<div class="ab" data-a="UNIOSUN"><h4>🎓 Campus</h4><p style="font-size:9px">Happy+20 + Okada</p></div>
+</div>
+<button class="btn" onclick="startVisualGame()">🛺 Enter Visual Osogbo →</button>
+<button class="btn btn-s" style="margin-top:6px" onclick="doLogout()">Logout</button>
+</div>
+</div>
+</div>
+
+<div id="adminScreen"><div class="container"><div class="card"><h2>🔐 Admin v2</h2><p style="font-size:11px;opacity:.7">Players: <span id="totalPlayers">0</span> | Rev: <span id="totalRev">₦0</span></p><button class="btn btn-s" style="margin-top:8px" onclick="closeAdmin()">Back</button> <button class="btn btn-s" style="margin-top:6px" onclick="exportData()">📥 Export JSON</button></div><div class="card"><table class="admin-table"><thead><tr><th>Name</th><th>Cash</th><th>Area</th><th>Vehicle</th><th>Premium</th><th>Action</th></tr></thead><tbody id="adminBody"></tbody></table></div><div class="card"><h3 style="font-size:12px">💰 Paystack</h3><input id="paystackKey" class="input" placeholder="pk_live_..."><input id="removeAdsPrice" class="input" type="number" value="500"><button class="btn" onclick="savePaystack()">Save</button></div></div></div>
+
+<div id="gameWrap">
+<canvas id="gameCanvas"></canvas>
+<div id="ui">
+<div class="top-bar"><div style="display:flex;gap:5px"><div class="stat-pill">❤️ <span id="health">100</span></div><div class="stat-pill">😊 <span id="happy">80</span></div><div class="stat-pill vehicle-pill" id="vehPill">🛺 <span id="vehName">Keke</span></div></div><div class="stat-pill cash-pill">₦<span id="cash">50k</span></div></div>
+<div id="miniMap"><canvas id="miniCanvas" width="90" height="90"></canvas></div>
+<div id="locationName">Oke-Baale</div>
+</div>
+<div id="joystick"><div id="joyBase"><div id="joyStick"></div></div></div>
+<div id="actions"><div class="act-btn" onclick="interact()">💬</div><div class="act-btn" onclick="toggleVehicle()">🛺</div><div class="act-btn" onclick="ageUpVisual()">⏭️</div><div class="act-btn" onclick="exitVisual()">🚪</div></div>
+<div id="eventModal"><h2 id="evTitle" style="color:#ff6b00;font-size:16px;margin-bottom:6px">Event</h2><p id="evText" style="font-size:12px;margin-bottom:10px"></p><div id="evOptions"></div><button class="opt-btn" style="background:#ff6b00;color:#000;font-weight:700;text-align:center;margin-top:6px" onclick="closeEvent()">Continue →</button></div>
+<div id="adGame" style="position:absolute;bottom:100px;left:50%;transform:translateX(-50%);background:#222;border:1px dashed #ff6b00;padding:8px 12px;border-radius:10px;font-size:10px;text-align:center;display:none;pointer-events:auto"><span id="adText">Ad!</span><br><button style="font-size:9px;background:#ff6b00;border:none;padding:3px 8px;border-radius:6px;margin-top:4px;cursor:pointer" onclick="buyRemoveAds()">Remove Ads</button></div>
+</div>
+
+<script>
+let curUser=null,player=null,selArea='Oke-Baale';
+let localUsers=JSON.parse(localStorage.getItem('osogbo_users')||'{}');
+let paystackKey=localStorage.getItem('paystack_key')||'pk_test_xxxxxxxxxxxxxxxx';
+let removeAdsPrice=parseInt(localStorage.getItem('ads_price')||'500');
+document.getElementById('paystackKey').value=paystackKey;document.getElementById('removeAdsPrice').value=removeAdsPrice;document.getElementById('priceDisplay').innerText=removeAdsPrice;
+function sw(t){document.getElementById('tL').classList.toggle('active',t==='l');document.getElementById('tS').classList.toggle('active',t==='s');document.getElementById('tA').classList.toggle('active',t==='a');document.getElementById('fL').style.display=t==='l'?'block':'none';document.getElementById('fS').style.display=t==='s'?'block':'none';document.getElementById('fA').style.display=t==='a'?'block':'none';}
+document.querySelectorAll('.ab').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.ab').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');selArea=b.dataset.a;});});
+window.doSignup=()=>{const n=document.getElementById('sn').value.trim(),e=document.getElementById('se').value.trim().toLowerCase(),p=document.getElementById('sp').value,er=document.getElementById('err');if(!n||!e||!p){er.innerText='Fill all';return;}if(localUsers[e]){er.innerText='Exists';return;}localUsers[e]={name:n,email:e,pass:p,bestCash:0,premium:false,created:Date.now(),totalPaid:0};localStorage.setItem('osogbo_users',JSON.stringify(localUsers));curUser={email:e,name:n,premium:false};afterLogin();}
+window.doLogin=()=>{const e=document.getElementById('le').value.trim().toLowerCase(),p=document.getElementById('lp').value,er=document.getElementById('err');if(!localUsers[e]||localUsers[e].pass!==p){er.innerText='Wrong';return;}curUser={email:e,name:localUsers[e].name,premium:localUsers[e].premium||false};afterLogin();}
+window.doAdminLogin=()=>{const e=document.getElementById('aei').value.trim(),p=document.getElementById('aep').value,er=document.getElementById('err');if(e==='admin@osogbo.com'&&p==='admin123'){document.getElementById('authContainer').style.display='none';document.getElementById('adminScreen').style.display='block';loadAdmin();}else{er.innerText='Wrong admin';}}
+window.doLogout=()=>{if(player&&curUser){localStorage.setItem('save_'+curUser.email,JSON.stringify(player));localUsers[curUser.email].bestCash=Math.max(localUsers[curUser.email].bestCash||0,player.cash);localStorage.setItem('osogbo_users',JSON.stringify(localUsers));}location.reload();}
+window.closeAdmin=()=>{document.getElementById('adminScreen').style.display='none';document.getElementById('authContainer').style.display='block';}
+function afterLogin(){document.getElementById('authScreen').style.display='none';document.getElementById('setupScreen').style.display='block';document.getElementById('wn').innerText=curUser.name;document.getElementById('premBadge').innerHTML=curUser.premium?'<span class="badge badge-premium">PREMIUM</span>':'<span class="badge badge-free">FREE</span>';document.getElementById('notPremiumBox').style.display=curUser.premium?'none':'block';loadLB();}
+function loadLB(){let el=document.getElementById('lb');let list=Object.values(localUsers).sort((a,b)=>(b.bestCash||0)-(a.bestCash||0)).slice(0,5);if(list.length===0){el.innerHTML='No players yet';return;}el.innerHTML=list.map((u,i)=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #222;font-size:12px"><span>${i+1}. ${u.name} ${u.premium?'⭐':''}</span><span>₦${(u.bestCash||0).toLocaleString()}</span></div>`).join('');}
+function loadAdmin(){let users=Object.values(localUsers);document.getElementById('totalPlayers').innerText=users.length;let rev=users.reduce((s,u)=>s+(u.totalPaid||0),0);document.getElementById('totalRev').innerText='₦'+rev.toLocaleString();let body=document.getElementById('adminBody');body.innerHTML='';users.forEach(u=>{let save=localStorage.getItem('save_'+u.email);let area='-',veh='Leg';try{let s=JSON.parse(save);area=s.area||'-';veh=s.vehicle||'Leg';}catch(e){}let tr=document.createElement('tr');tr.innerHTML=`<td>${u.name}</td><td>₦${(u.bestCash||0).toLocaleString()}</td><td>${area}</td><td>${veh}</td><td>${u.premium?'⭐':'FREE'}</td><td><button style="font-size:9px;padding:2px 6px;background:#333;color:#fff;border:none;border-radius:4px" onclick="delUser('${u.email}')">Del</button> <button style="font-size:9px;padding:2px 6px;background:#ff6b00;color:#000;border:none;border-radius:4px" onclick="makePremium('${u.email}')">${u.premium?'Remove':'Prem'}</button></td>`;body.appendChild(tr);});}
+window.delUser=(email)=>{if(confirm('Delete '+email+'?')){delete localUsers[email];localStorage.removeItem('save_'+email);localStorage.setItem('osogbo_users',JSON.stringify(localUsers));loadAdmin();loadLB();}}
+window.makePremium=(email)=>{localUsers[email].premium=!localUsers[email].premium;localStorage.setItem('osogbo_users',JSON.stringify(localUsers));loadAdmin();}
+window.exportData=()=>{let data=JSON.stringify(localUsers,null,2);let blob=new Blob([data],{type:'application/json'});let url=URL.createObjectURL(blob);let a=document.createElement('a');a.href=url;a.download='osogbo_users.json';a.click();}
+window.savePaystack=()=>{paystackKey=document.getElementById('paystackKey').value;removeAdsPrice=parseInt(document.getElementById('removeAdsPrice').value)||500;localStorage.setItem('paystack_key',paystackKey);localStorage.setItem('ads_price',removeAdsPrice);alert('Saved!');document.getElementById('priceDisplay').innerText=removeAdsPrice;}
+window.buyRemoveAds=()=>{if(!curUser){alert('Login first');return;}let handler=PaystackPop.setup({key:paystackKey,email:curUser.email,amount:removeAdsPrice*100,currency:'NGN',ref:'OSOGBO_'+Math.floor(Math.random()*1000000000),callback:function(r){localUsers[curUser.email].premium=true;localUsers[curUser.email].totalPaid=(localUsers[curUser.email].totalPaid||0)+removeAdsPrice;localStorage.setItem('osogbo_users',JSON.stringify(localUsers));curUser.premium=true;if(player){player.cash+=100000;player.premium=true;localStorage.setItem('save_'+curUser.email,JSON.stringify(player));}alert('Premium! +₦100k');location.reload();},onClose:function(){alert('Cancelled');}});handler.openIframe();}
+
+
+
+
+const canvas=document.getElementById('gameCanvas');const ctx=canvas.getContext('2d');const miniCanvas=document.getElementById('miniCanvas');const miniCtx=miniCanvas.getContext('2d');canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+const map={width:2000,height:2000,areas:[
+{name:"Oke-Baale",x:200,y:200,w:400,h:300,color:"#8B4513",desc:"Your compound"},
+{name:"Oke-Fia",x:700,y:150,w:500,h:350,color:"#D2B48C",desc:"Busy shops"},
+{name:"Olaiya",x:600,y:600,w:400,h:200,color:"#555",desc:"Keke park 🛺"},
+{name:"Oja-Oba",x:100,y:600,w:400,h:300,color:"#CD853F",desc:"King market"},
+{name:"GRA",x:1100,y:600,w:400,h:400,color:"#90EE90",desc:"Rich houses"},
+{name:"UNIOSUN",x:1300,y:150,w:500,h:400,color:"#4169E1",desc:"University 🏍️"},
+{name:"Osun Grove",x:100,y:1100,w:600,h:400,color:"#228B22",desc:"Sacred grove"},
+{name:"Alekuwodo",x:800,y:900,w:500,h:300,color:"#A0522D",desc:"Business"},
+{name:"Ofatedo",x:1400,y:900,w:400,h:500,color:"#DEB887",desc:"New estates"},
+],buildings:[
+{x:300,y:250,w:80,h:60,type:"house",area:"Oke-Baale",name:"Family House"},
+{x:800,y:200,w:100,h:80,type:"shop",area:"Oke-Fia",name:"Mama Nkechi Shop"},
+{x:150,y:650,w:120,h:80,type:"market",area:"Oja-Oba",name:"Oja-Oba Market"},
+{x:1200,y:700,w:100,h:100,type:"mansion",area:"GRA",name:"Big Man House"},
+{x:1400,y:200,w:150,h:100,type:"school",area:"UNIOSUN",name:"UNIOSUN Gate"},
+{x:200,y:1200,w:80,h:80,type:"shrine",area:"Osun Grove",name:"Osun Shrine"},
+{x:900,y:950,w:90,h:70,type:"shop",area:"Alekuwodo",name:"Bet9ja & POS"},
+],npcs:[
+{x:400,y:300,name:"Mama",type:"mama",area:"Oke-Baale",dialog:"Wale! Go fetch water!"},
+{x:850,y:250,name:"Shop Owner",type:"trader",area:"Oke-Fia",dialog:"Buy Gala ₦200!"},
+{x:700,y:650,name:"Keke Driver",type:"driver",area:"Olaiya",dialog:"Oke-Fia! Oke-Fia! Na ₦200! Enter Keke press 🛺 button!"},
+{x:200,y:700,name:"Fish Seller",type:"trader",area:"Oja-Oba",dialog:"Fresh fish!"},
+{x:1450,y:250,name:"Okada Guy",type:"student",area:"UNIOSUN",dialog:"Okada! Oke-Baale ₦300! Press 🛺 button to enter Okada!"},
+{x:250,y:1250,name:"Priestess",type:"priestess",area:"Osun Grove",dialog:"Osun bless you."},
+],vehicles:[
+{x:650,y:650,w:60,h:35,type:"keke",name:"Keke",area:"Olaiya",price:0,speed:6},
+{x:750,y:680,w:60,h:35,type:"keke",name:"Keke",area:"Olaiya",price:0,speed:6},
+{x:1400,y:300,w:45,h:20,type:"okada",name:"Okada",area:"UNIOSUN",price:0,speed:8},
+{x:1500,y:320,w:45,h:20,type:"okada",name:"Okada",area:"UNIOSUN",price:0,speed:8},
+{x:1250,y:750,w:70,h:40,type:"car",name:"Car",area:"GRA",price:500000,speed:10},
+]};
+let camera={x:0,y:0},keys={},joystick={active:false,dx:0,dy:0},adCount=0;
+const joyBase=document.getElementById('joyBase'),joyStick=document.getElementById('joyStick');
+joyBase.addEventListener('touchstart',()=>{joystick.active=true;});
+joyBase.addEventListener('touchmove',(e)=>{if(!joystick.active)return;e.preventDefault();let rect=joyBase.getBoundingClientRect();let t=e.touches[0];let cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;let dx=t.clientX-cx,dy=t.clientY-cy;let dist=Math.sqrt(dx*dx+dy*dy),max=40;if(dist>max){dx=dx/dist*max;dy=dy/dist*max;}joyStick.style.transform=`translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;joystick.dx=dx/max;joystick.dy=dy/max;},{passive:false});
+joyBase.addEventListener('touchend',()=>{joystick.active=false;joystick.dx=0;joystick.dy=0;joyStick.style.transform='translate(-50%,-50%)';});
+window.addEventListener('keydown',e=>keys[e.key.toLowerCase()]=true);
+window.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+const evs=[
+{min:0,max:5,t:"Born for Osogbo!",x:"Born Asubiaro. Papa buy malt.",o:[{t:"Cry",e:{happiness:-2}},{t:"Sleep",e:{health:5}}]},
+{min:12,max:15,t:"Egungun Festival",x:"Egungun pursue you Isale Osun! Jump Keke fast!",o:[{t:"Jump Keke! 🛺",e:{health:-5,street:15,cash:-200}},{t:"Run leg",e:{health:-10,street:10}}]},
+{min:16,max:18,t:"JAMB",x:"Score 195. Need ₦200k. Papa get ₦50k.",o:[{t:"Learn Adire",e:{job:"Adire Maker",cash:30000}},{t:"POS Gate",e:{job:"POS",cash:50000}}]},
+{min:23,max:30,t:"Job",x:"Oga say bring ₦500k for job.",o:[{t:"Pay ₦500k",e:{job:"Civil Servant",cash:-500000}},{t:"Keke driver ₦100k",e:{job:"Keke Driver",cash:100000,vehicle:"keke"}},{t:"Okada ₦60k",e:{job:"Okada Rider",cash:60000,vehicle:"okada"}}]},
+{min:24,max:32,t:"Osun Festival!",x:"August! Oyinbo full town. Drive tourists!",o:[{t:"Keke tour guide ₦150k",e:{cash:150000}},{t:"Sell Adire ₦90k",e:{cash:90000}}]},
+{min:27,max:33,t:"Land",x:"Buy land Ofatedo ₦800k. Omo Onile ask ₦300k.",o:[{t:"Pay ₦300k",e:{cash:-300000}},{t:"Leave",e:{cash:500000}}]},
+{min:35,max:50,t:"Japa",x:"Agent UK visa ₦6M.",o:[{t:"Pay ₦6M",e:{cash:-6000000}},{t:"Legit ₦2M",e:{cash:-2000000}}]},
+];
+window.startVisualGame=()=>{
+ let a=selArea;let saved=localStorage.getItem('save_'+curUser.email);
+ if(saved){ player=JSON.parse(saved); }
+ else{
+  player={name:curUser.name,area:a,x:a==='Oke-Baale'?350:a==='Oke-Fia'?800:a==='GRA'?1200:1400,y:a==='Oke-Baale'?350:a==='Oke-Fia'?250:300,vx:0,vy:0,speed:3,size:16,health:100,happiness:80,smarts:50,street:50,cash:a==='GRA'?500000:a==='Oke-Fia'?80000:a==='UNIOSUN'?40000:20000,age:18,job:"Student",anim:0,dir:"down",premium:curUser.premium||false,vehicle:null,vehicleType:null,log:[`Born ${a}`]};
+  if(a==='GRA'){player.vehicle='car';player.vehicleType='car';player.speed=6}
+  if(a==='UNIOSUN'){player.vehicle='okada';player.vehicleType='okada';player.speed=5}
+ }
+ document.getElementById('authContainer').style.display='none';document.getElementById('gameWrap').style.display='block';canvas.width=window.innerWidth;canvas.height=window.innerHeight;gameLoop();
+ if(player.vehicle) showVehiclePill();
+}
+function showVehiclePill(){document.getElementById('vehPill').style.display='flex';document.getElementById('vehName').innerText=player.vehicleType==='keke'?'Keke 🛺':player.vehicleType==='okada'?'Okada 🏍️':'Car 🚗';}
+function hideVehiclePill(){document.getElementById('vehPill').style.display='none';}
+function updatePlayer(){
+ if(!player) return;let dx=0,dy=0;
+ if(keys['w']||keys['arrowup']) dy=-1;if(keys['s']||keys['arrowdown']) dy=1;if(keys['a']||keys['arrowleft']) dx=-1;if(keys['d']||keys['arrowright']) dx=1;
+ if(joystick.active){dx=joystick.dx;dy=joystick.dy;}
+ if(dx!==0||dy!==0){let len=Math.sqrt(dx*dx+dy*dy);dx/=len;dy/=len;player.vx=dx*player.speed;player.vy=dy*player.speed;player.anim+=player.vehicle?0.4:0.2;if(Math.abs(dx)>Math.abs(dy))player.dir=dx>0?"right":"left";else player.dir=dy>0?"down":"up";}else{player.vx*=0.8;player.vy*=0.8;player.anim=0;}
+ player.x+=player.vx;player.y+=player.vy;player.x=Math.max(0,Math.min(map.width,player.x));player.y=Math.max(0,Math.min(map.height,player.y));
+ for(let area of map.areas){if(player.x>area.x&&player.x<area.x+area.w&&player.y>area.y&&player.y<area.y+area.h){if(player.area!==area.name){player.area=area.name;document.getElementById('locationName').innerText=area.name+" - "+area.desc;if(Math.random()<0.2) triggerRandomEvent();}}}
+ camera.x=player.x-canvas.width/2;camera.y=player.y-canvas.height/2;camera.x=Math.max(0,Math.min(map.width-canvas.width,camera.x));camera.y=Math.max(0,Math.min(map.height-canvas.height,camera.y));
+}
+function draw(){
+ ctx.fillStyle="#1a3d0a";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.save();ctx.translate(-camera.x,-camera.y);
+ ctx.strokeStyle="#333";ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(0,750);ctx.lineTo(2000,750);ctx.stroke();ctx.beginPath();ctx.moveTo(650,0);ctx.lineTo(650,2000);ctx.stroke();
+ ctx.setLineDash([20,15]);ctx.strokeStyle="#fff";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,750);ctx.lineTo(2000,750);ctx.stroke();ctx.setLineDash([]);
+ for(let area of map.areas){ctx.fillStyle=area.color;ctx.globalAlpha=0.6;ctx.fillRect(area.x,area.y,area.w,area.h);ctx.globalAlpha=1;ctx.strokeStyle="#ff6b00";ctx.lineWidth=2;ctx.strokeRect(area.x,area.y,area.w,area.h);ctx.fillStyle="#fff";ctx.font="bold 13px Space Grotesk";ctx.fillText(area.name,area.x+8,area.y+18);}
+ for(let b of map.buildings){ctx.fillStyle=b.type==="house"?"#8B4513":b.type==="shop"?"#ff6b00":b.type==="market"?"#CD853F":b.type==="mansion"?"#FFD700":b.type==="school"?"#4169E1":"#228B22";ctx.fillRect(b.x,b.y,b.w,b.h);ctx.fillStyle="#000";ctx.fillRect(b.x+10,b.y+b.h-15,b.w-20,10);ctx.fillStyle="#654321";ctx.fillRect(b.x-5,b.y-10,b.w+10,12);}
+ for(let v of map.vehicles){
+  if(player.vehicle && Math.hypot(player.x-v.x,player.y-v.y)<50 && player.vehicleType===v.type) continue;
+  if(v.type==='keke'){ctx.fillStyle="#FFD700";ctx.fillRect(v.x,v.y,v.w,v.h);ctx.fillStyle="#000";ctx.fillRect(v.x+5,v.y+5,v.w-10,8);ctx.fillStyle="#333";ctx.beginPath();ctx.arc(v.x+10,v.y+v.h,8,0,Math.PI*2);ctx.arc(v.x+v.w-10,v.y+v.h,8,0,Math.PI*2);ctx.fill();}
+  else if(v.type==='okada'){ctx.fillStyle="#ff0000";ctx.fillRect(v.x,v.y,v.w,v.h);ctx.fillStyle="#333";ctx.beginPath();ctx.arc(v.x+8,v.y+v.h,6,0,Math.PI*2);ctx.arc(v.x+v.w-8,v.y+v.h,6,0,Math.PI*2);ctx.fill();}
+  else{ctx.fillStyle="#fff";ctx.fillRect(v.x,v.y,v.w,v.h);ctx.fillStyle="#4169E1";ctx.fillRect(v.x+5,v.y+5,v.w-10,12);}
+ }
+ for(let npc of map.npcs){ctx.fillStyle="#ff00ff";ctx.beginPath();ctx.arc(npc.x,npc.y,11,0,Math.PI*2);ctx.fill();ctx.fillStyle="#fff";ctx.font="10px Space Grotesk";ctx.fillText(npc.name,npc.x-18,npc.y-16);}
+ if(player){
+  ctx.save();ctx.translate(player.x,player.y);
+  ctx.fillStyle="rgba(0,0,0,0.3)";ctx.beginPath();ctx.ellipse(0,8,10,4,0,0,Math.PI*2);ctx.fill();
+  if(player.vehicleType){
+   let wobble=Math.sin(player.anim*2)*2;ctx.translate(wobble,0);
+   if(player.vehicleType==='keke'){
+    ctx.fillStyle="#FFD700";ctx.fillRect(-30,-20,60,35);ctx.fillStyle="#000";ctx.fillRect(-20,-15,40,10);ctx.fillStyle="#ffdbac";ctx.beginPath();ctx.arc(0,-25,8,0,Math.PI*2);ctx.fill();ctx.fillStyle="#333";ctx.beginPath();ctx.arc(-18,15,9,0,Math.PI*2);ctx.arc(18,15,9,0,Math.PI*2);ctx.fill();
+    if(Math.abs(player.vx)>1||Math.abs(player.vy)>1){ctx.fillStyle="rgba(100,100,100,0.5)";ctx.beginPath();ctx.arc(-30,5,4+Math.random()*4,0,Math.PI*2);ctx.fill();}
+   }else if(player.vehicleType==='okada'){
+    ctx.fillStyle="#ff0000";ctx.fillRect(-22,-8,44,12);ctx.fillStyle="#ffdbac";ctx.beginPath();ctx.arc(0,-18,7,0,Math.PI*2);ctx.fill();ctx.fillStyle="#333";ctx.beginPath();ctx.arc(-15,10,7,0,Math.PI*2);ctx.arc(15,10,7,0,Math.PI*2);ctx.fill();let lean=player.vx*0.1;ctx.translate(lean,0);
+   }else{
+    ctx.fillStyle="#fff";ctx.fillRect(-35,-15,70,30);ctx.fillStyle="#4169E1";ctx.fillRect(-25,-10,50,10);ctx.fillStyle="#ffdbac";ctx.beginPath();ctx.arc(-5,-18,6,0,Math.PI*2);ctx.fill();ctx.fillStyle="#111";ctx.beginPath();ctx.arc(-20,15,8,0,Math.PI*2);ctx.arc(20,15,8,0,Math.PI*2);ctx.fill();
+   }
+  }else{
+   let bob=Math.sin(player.anim)*3;ctx.translate(0,bob);ctx.fillStyle="#ff6b00";ctx.fillRect(-8,-16,16,20);ctx.fillStyle="#ffdbac";ctx.beginPath();ctx.arc(0,-22,10,0,Math.PI*2);ctx.fill();ctx.fillStyle="#000";ctx.fillRect(-10,-30,20,6);let legSwing=Math.sin(player.anim)*6;ctx.fillStyle="#222";ctx.fillRect(-6+legSwing,4,5,10);ctx.fillRect(1-legSwing,4,5,10);
+  }
+  ctx.restore();
+ }
+ ctx.restore();
+ miniCtx.clearRect(0,0,90,90);miniCtx.fillStyle="#1a3d0a";miniCtx.fillRect(0,0,90,90);
+ for(let area of map.areas){miniCtx.fillStyle=area.color;miniCtx.fillRect(area.x/map.width*90,area.y/map.height*90,area.w/map.width*90,area.h/map.height*90);}
+ for(let v of map.vehicles){miniCtx.fillStyle=v.type==='keke'?"#FFD700":v.type==='okada'?"#f00":"#fff";miniCtx.fillRect(v.x/map.width*90,v.y/map.height*90,3,3);}
+ if(player){miniCtx.fillStyle="#ff6b00";miniCtx.beginPath();miniCtx.arc(player.x/map.width*90,player.y/map.height*90,3,0,Math.PI*2);miniCtx.fill();}
+}
+function updateUI(){if(!player)return;document.getElementById('health').innerText=player.health;document.getElementById('happy').innerText=player.happiness;document.getElementById('cash').innerText=player.cash>1000?(player.cash/1000).toFixed(0)+'k':player.cash;document.getElementById('locationName').innerText=player.area+(player.vehicleType?' 🛺 '+player.vehicleType:'');}
+function triggerRandomEvent(){let poss=evs.filter(ev=>player.age>=ev.min&&player.age<=ev.max);if(poss.length===0)return;let ev=poss[Math.floor(Math.random()*poss.length)];showEvent(ev.t,ev.x,ev.o);}
+function showEvent(title,text,options){document.getElementById('evTitle').innerText=title;document.getElementById('evText').innerText=text;let div=document.getElementById('evOptions');div.innerHTML='';options.forEach(opt=>{let btn=document.createElement('button');btn.className='opt-btn';btn.innerHTML=`${opt.t}<br><small style="opacity:.6">${fmt(opt.e)}</small>`;btn.onclick=()=>{if(opt.e.cash)player.cash+=opt.e.cash;if(opt.e.health)player.health=Math.min(100,Math.max(0,player.health+opt.e.health));if(opt.e.happiness)player.happiness=Math.min(100,Math.max(0,player.happiness+opt.e.happiness));if(opt.e.smarts)player.smarts=Math.min(100,Math.max(0,player.smarts+opt.e.smarts));if(opt.e.street)player.street=Math.min(100,Math.max(0,player.street+opt.e.street));if(opt.e.job)player.job=opt.e.job;if(opt.e.area)player.area=opt.e.area;if(opt.e.vehicle){player.vehicle=opt.e.vehicle;player.vehicleType=opt.e.vehicle;player.speed=opt.e.vehicle==='keke'?6:opt.e.vehicle==='okada'?8:10;showVehiclePill();}if(player.cash<0)player.cash=0;localStorage.setItem('save_'+curUser.email,JSON.stringify(player));updateUI();closeEvent();};div.appendChild(btn);});document.getElementById('eventModal').style.display='block';adCount++;if(!player.premium&&adCount%3===0){document.getElementById('adGame').style.display='block';document.getElementById('adText').innerText=["Keke to Oke-Fia ₦200!","Okada fast fast!","Buy fuel Olaiya!"][Math.floor(Math.random()*3)];}else{document.getElementById('adGame').style.display='none';}}
+function fmt(e){let s=[];if(e.cash)s.push((e.cash>0?'+':'')+'₦'+e.cash.toLocaleString());if(e.job)s.push(e.job);if(e.vehicle)s.push('Get '+e.vehicle);return s.join(' • ');}
+window.closeEvent=()=>{document.getElementById('eventModal').style.display='none';}
+window.interact=()=>{let nearest=null,minDist=80;for(let npc of map.npcs){let d=Math.hypot(player.x-npc.x,player.y-npc.y);if(d<minDist){minDist=d;nearest=npc;}}if(nearest){showEvent(nearest.name,nearest.dialog,[{t:"Ok thanks!",e:{}},{t:"Give ₦500",e:{cash:-500,happiness:5}}]);}else{let nearVeh=null;for(let v of map.vehicles){let d=Math.hypot(player.x-v.x,player.y-v.y);if(d<70) nearVeh=v;}if(nearVeh){showEvent(nearVeh.name+" Park","You see "+nearVeh.name+" for "+nearVeh.area+". Enter?",[{t:"Enter "+nearVeh.name+" 🛺",e:{vehicle:nearVeh.type}},{t:"Leave am",e:{}}]);}else{showEvent("Osogbo Street","You dey "+player.area+".",[{t:"Hustle ₦5k",e:{cash:5000,street:2}},{t:"Rest",e:{health:5}}]);}}}
+window.toggleVehicle=()=>{
+ if(player.vehicleType){
+  player.vehicle=null;player.vehicleType=null;player.speed=3;hideVehiclePill();showEvent("Exit Vehicle","You come down. Waka leg now.",[{t:"Ok",e:{}}]);
+ }else{
+  let nearVeh=null;for(let v of map.vehicles){let d=Math.hypot(player.x-v.x,player.y-v.y);if(d<70) nearVeh=v;}
+  if(nearVeh){if(nearVeh.price>0&&player.cash<nearVeh.price){alert("Need ₦"+nearVeh.price.toLocaleString());return;}if(nearVeh.price>0)player.cash-=nearVeh.price;player.vehicle=nearVeh.type;player.vehicleType=nearVeh.type;player.speed=nearVeh.speed;showVehiclePill();showEvent("Entered "+nearVeh.name,"You don enter "+nearVeh.name+"! Speed x"+(nearVeh.speed/3).toFixed(1)+" faster!",[{t:"Vroom! 🛺💨",e:{}}]);}
+  else{showEvent("No Vehicle","No Keke/Okada near. Go Olaiya for Keke, UNIOSUN for Okada, GRA for Car.",[{t:"Ok",e:{}}]);}
+ }
+}
+window.openBag=()=>{showEvent("Your Bag 🎒",`Cash: ₦${player.cash.toLocaleString()}\nJob: ${player.job}\nAge: ${player.age}\nArea: ${player.area}\nVehicle: ${player.vehicleType||'Leg'}\nPremium: ${player.premium?'YES ⭐':'NO'}`,[{t:"Close",e:{}}]);}
+window.ageUpVisual=()=>{player.age++;if(player.age>75){alert(`Life done! ₦${player.cash.toLocaleString()}`);exitVisual();return;}let exp=player.area==='GRA'?50000:player.area==='Oke-Fia'?20000:10000;player.cash-=exp;localStorage.setItem('save_'+curUser.email,JSON.stringify(player));localUsers[curUser.email].bestCash=Math.max(localUsers[curUser.email].bestCash||0,player.cash);localStorage.setItem('osogbo_users',JSON.stringify(localUsers));updateUI();if(player.age%2===0)triggerRandomEvent();}
+window.exitVisual=()=>{if(player){localStorage.setItem('save_'+curUser.email,JSON.stringify(player));}document.getElementById('gameWrap').style.display='none';document.getElementById('authContainer').style.display='block';document.getElementById('setupScreen').style.display='none';document.getElementById('authScreen').style.display='block';loadLB();}
+function gameLoop(){updatePlayer();draw();updateUI();requestAnimationFrame(gameLoop);}
+window.addEventListener('resize',()=>{canvas.width=window.innerWidth;canvas.height=window.innerHeight;});
+loadLB();
+</script>
+</body>
+</html>
+
+
